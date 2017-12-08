@@ -1,9 +1,10 @@
 package repository
 
-import pl.eltrox.apps.cli.data.CartRepository
-import pl.eltrox.apps.cli.data.CustomerRepository
-import pl.eltrox.apps.cli.data.ProductRepository
+import pl.eltrox.data.memory.CartRepository
+import pl.eltrox.data.memory.CustomerRepository
+import pl.eltrox.data.memory.ProductRepository
 import pl.eltrox.core.domain.entity.Cart
+import pl.eltrox.core.domain.entity.Product
 import spock.lang.Specification
 
 class CartRepositorySpecs extends Specification {
@@ -31,7 +32,7 @@ class CartRepositorySpecs extends Specification {
 
         then:
         cart != null
-        cart.id == cartId
+        cart.getId() == cartId
         cart.getClass() == Cart
 
         where:
@@ -58,14 +59,14 @@ class CartRepositorySpecs extends Specification {
         def carts = cartRepository.all()
 
         then:
-        carts.size() == 4
+        carts.size() == 2
         carts.each { it.getClass() == Cart }
         carts.each { [1L, 2L, 3L, 4L].contains(it.id) }
     }
 
     def "CartRepository.save() add new Cart if given Cart without id"() {
         setup:
-        def cart = new Cart("Camera", "1234")
+        def cart = new Cart(null)
         int beforeSaveCount = cartRepository.count()
 
         when:
@@ -73,29 +74,26 @@ class CartRepositorySpecs extends Specification {
         int afterSaveCount = cartRepository.count()
 
         then:
-        addedCart != cart
+        !addedCart.is(cart)
         cart.id == null
         addedCart.id != null
         beforeSaveCount == afterSaveCount - 1
-
-        cart.name == addedCart.name
-        cart.sku == addedCart.sku
     }
 
     def "CartRepository.save() should modify Cart if given Cart with existing id"() {
         setup:
         def cart = cartRepository.get(1L)
-        String newName = "Camera"
         int beforeSaveCount = cartRepository.count()
+        def product = new Product("new product", "234345", 5L)
 
         when:
-        cart.setName(newName)
+        cart.addProduct(product)
         def modifiedCart = cartRepository.save(cart)
         int afterSaveCount = cartRepository.count()
 
         then:
-        cart != modifiedCart
-        modifiedCart.name == newName
+        !cart.is(modifiedCart)
+        modifiedCart.isProductInCart(product) == true
         beforeSaveCount == afterSaveCount
     }
 
@@ -116,20 +114,17 @@ class CartRepositorySpecs extends Specification {
     def "CartRepository.save() should add new Cart if given Cart with not existing id"() {
         setup:
         Long cartId = 99L
-        Cart cart = new Cart("Camera", "124", cartId)
+        def cart = new Cart(null, null, cartId)
         int beforeSaveCount = cartRepository.count()
 
         when:
-        Cart addedCart = cartRepository.save(cart)
+        def addedCart = cartRepository.save(cart)
         int afterSaveCount = cartRepository.count()
 
         then:
-        addedCart != cart
+        !addedCart.is(cart)
 
         cart.getId() == addedCart.getId()
-        cart.getName() == addedCart.getName()
-        cart.getSku() == addedCart.getSku()
-
         beforeSaveCount == afterSaveCount - 1
     }
 }

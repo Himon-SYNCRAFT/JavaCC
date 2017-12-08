@@ -36,3 +36,7 @@ dependencies {
     testCompile group: 'com.mscharhag.oleaster', name: 'oleaster-matcher', version: '0.2.0'
     testCompile group: 'com.mscharhag.oleaster', name: 'oleaster-runner', version: '0.2.0'
 }
+
+springBoot {
+    mainClass = "pl.eltrox.apps.webapi.Application"
+}

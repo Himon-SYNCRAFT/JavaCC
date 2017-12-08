@@ -1,6 +1,6 @@
 package repository
 
-import pl.eltrox.apps.cli.data.CustomerRepository
+import pl.eltrox.data.memory.CustomerRepository
 import pl.eltrox.core.domain.entity.Customer
 import spock.lang.Specification
 
@@ -65,7 +65,7 @@ class CustomerRepositorySpecs extends Specification {
         int afterSaveCount = customerRepository.count()
 
         then:
-        addedCustomer != customer
+        !addedCustomer.is(customer)
         customer.id == null
         addedCustomer.id != null
         beforeSaveCount == afterSaveCount - 1
@@ -78,15 +78,17 @@ class CustomerRepositorySpecs extends Specification {
         setup:
         def customer = customerRepository.get(1L)
         String newName = "Daniel"
+        String newLastName = "sadfsd"
         int beforeSaveCount = customerRepository.count()
 
         when:
         customer.setFirstName(newName)
+        customer.setLastName(newLastName)
         def modifiedCustomer = customerRepository.save(customer)
         int afterSaveCount = customerRepository.count()
 
         then:
-        customer != modifiedCustomer
+        !customer.is(modifiedCustomer)
         modifiedCustomer.firstName == newName
         beforeSaveCount == afterSaveCount
     }
@@ -116,7 +118,7 @@ class CustomerRepositorySpecs extends Specification {
         int afterSaveCount = customerRepository.count()
 
         then:
-        addedCustomer != customer
+        !addedCustomer.is(customer)
 
         customer.getId() == addedCustomer.getId()
         customer.getFirstName() == addedCustomer.getFirstName()

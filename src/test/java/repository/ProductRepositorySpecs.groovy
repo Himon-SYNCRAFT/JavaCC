@@ -1,6 +1,6 @@
 package repository
 
-import pl.eltrox.apps.cli.data.ProductRepository
+import pl.eltrox.data.memory.ProductRepository
 import pl.eltrox.core.domain.entity.Product
 import spock.lang.Specification
 
@@ -63,7 +63,7 @@ class ProductRepositorySpecs extends Specification {
         int afterSaveCount = productRepository.count()
 
         then:
-        addedProduct != product
+        !addedProduct.is(product)
         product.id == null
         addedProduct.id != null
         beforeSaveCount == afterSaveCount - 1
@@ -76,15 +76,17 @@ class ProductRepositorySpecs extends Specification {
         setup:
         def product = productRepository.get(1L)
         String newName = "Camera"
+        String newSku = "asdfsdf"
         int beforeSaveCount = productRepository.count()
 
         when:
         product.setName(newName)
+        product.setSku(newSku)
         def modifiedProduct = productRepository.save(product)
         int afterSaveCount = productRepository.count()
 
         then:
-        product != modifiedProduct
+        !product.is(modifiedProduct)
         modifiedProduct.name == newName
         beforeSaveCount == afterSaveCount
     }
@@ -114,7 +116,7 @@ class ProductRepositorySpecs extends Specification {
         int afterSaveCount = productRepository.count()
 
         then:
-        addedProduct != product
+        !addedProduct.is(product)
 
         product.getId() == addedProduct.getId()
         product.getName() == addedProduct.getName()

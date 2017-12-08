@@ -6,5 +6,6 @@ public interface ResponseInterface<Data> {
     public boolean hasErrors();
     public List getErrors();
     public Data getData();
+    public void setData(Data data);
     public void addError(String error);
 }

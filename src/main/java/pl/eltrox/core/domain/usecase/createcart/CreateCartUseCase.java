@@ -14,25 +14,45 @@ public class CreateCartUseCase implements UseCaseInterface<CreateCartResponse, C
     private final CartRepositoryInterface cartRepository;
 
     public CreateCartUseCase(CartRepositoryInterface cartRepository, ProductRepositoryInterface productRepository,
-                             CustomerRepositoryInterface userRepository) {
+                             CustomerRepositoryInterface customerRepository) {
         this.cartRepository = cartRepository;
         this.productRepository = productRepository;
-        this.customerRepository = userRepository;
+        this.customerRepository = customerRepository;
     }
 
     @Override
     public CreateCartResponse execute(CreateCartRequest request) {
-        Customer customer = customerRepository.get(request.getCustomerId());
-        Product product = null;
+        CreateCartResponse response = new CreateCartResponse();
+        Long customerId = request.getCustomerId();
 
-        if (request.getProductId() != null) {
-           product = productRepository.get(request.getProductId());
+        if (customerId == null) {
+            response.addError("Cannot create cart without customer");
+            return response;
         }
 
-        Cart cart = new Cart(customer);
-        cart.addProduct(product);
-        cart = cartRepository.save(cart);
+        Customer customer = customerRepository.get(request.getCustomerId());
 
-        return new CreateCartResponse(cart);
+        if (customer == null) {
+            response.addError("Provided customerId is invalid. Customer not found");
+            return response;
+        }
+
+        Product product = null;
+        Cart cart = new Cart(customer);
+
+        if (request.getProductId() != null) {
+            product = productRepository.get(request.getProductId());
+
+            if (product == null) {
+                response.addError("Provided productId is invalid. Product not found");
+                return response;
+            }
+
+            cart.addProduct(product);
+        }
+
+        cart = cartRepository.save(cart);
+        response.setData(cart);
+        return response;
     }
 }

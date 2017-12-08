@@ -7,7 +7,7 @@ public abstract class Entity implements Cloneable {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         if (this.id == null) {
             this.id = id;
         }
@@ -15,4 +15,10 @@ public abstract class Entity implements Cloneable {
 
     @Override
     public abstract Entity clone();
+
+    @Override
+    public abstract boolean equals(Object obj);
+
+    @Override
+    public abstract int hashCode();
 }
