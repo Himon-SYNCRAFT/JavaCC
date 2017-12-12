@@ -60,4 +60,37 @@ public class CustomerRepository implements CustomerRepositoryInterface {
     public int count() {
         return items.size();
     }
+
+    @Override
+    public Collection<Customer> find(Map filter) {
+        Boolean shouldFilterByFirstName = filter.get("firstName") != null;
+        Boolean shouldFilterByLastName = filter.get("lastName") != null;
+        ArrayList<Customer> customers = new ArrayList<>();
+
+        for (Customer customer : items.values()) {
+            Boolean shouldAddCustomer = true;
+
+            if (shouldFilterByFirstName) {
+                String firstName = filter.get("firstName").toString().toLowerCase();
+
+                if (!customer.getFirstName().toLowerCase().contains(firstName)) {
+                    shouldAddCustomer = false;
+                }
+            }
+
+            if (shouldFilterByLastName) {
+                String lastName = filter.get("lastName").toString().toLowerCase();
+
+                if (!customer.getLastName().toLowerCase().contains(lastName)) {
+                    shouldAddCustomer = false;
+                }
+            }
+
+            if (shouldAddCustomer) {
+                customers.add(customer);
+            }
+        }
+
+        return customers;
+    }
 }

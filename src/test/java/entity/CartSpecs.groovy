@@ -13,7 +13,7 @@ class CartSpecs extends Specification {
         then:
         !cart.is(clonedCart)
         cart.customer.equals(clonedCart.customer)
-        cart.products.equals(clonedCart.products)
+        cart.items.equals(clonedCart.items)
         cart.id.equals(clonedCart.id)
 
         where:

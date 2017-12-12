@@ -1,4 +1,4 @@
-package repository
+package repository.memory
 
 import pl.eltrox.data.memory.ProductRepository
 import pl.eltrox.core.domain.entity.Product
@@ -48,7 +48,7 @@ class ProductRepositorySpecs extends Specification {
         def products = productRepository.all()
 
         then:
-        products.size() == 4
+        products.size() == productRepository.count()
         products.each { it.getClass() == Product }
         products.each { [1L, 2L, 3L, 4L].contains(it.id) }
     }
@@ -123,5 +123,41 @@ class ProductRepositorySpecs extends Specification {
         product.getSku() == addedProduct.getSku()
 
         beforeSaveCount == afterSaveCount - 1
+    }
+
+    def "ProductRepository.find() should return collection of Products filtered by sku"() {
+        setup:
+        def filter = [sku: "1"]
+
+        when:
+        Collection<Product> products = productRepository.find(filter)
+
+        then:
+        products.each { it.sku.contains("1".toLowerCase())}
+        products.size() != 0
+    }
+
+    def "ProductRepository.find() should return collection of Products filtered by id"() {
+        setup:
+        def filter = [id: 1L]
+
+        when:
+        Collection<Product> products = productRepository.find(filter)
+
+        then:
+        products.each { it.id == 1L }
+        products.size() != 0
+    }
+
+    def "ProductRepository.find() should return collection of Products filtered by name and sku"() {
+        setup:
+        def filter = [name: "Kamera", sku:"1"]
+
+        when:
+        Collection<Product> products = productRepository.find(filter)
+
+        then:
+        products.each { it.name.contains("Kamera".toLowerCase()) && it.sku.contains("1".toLowerCase())  }
+        products.size() != 0
     }
 }

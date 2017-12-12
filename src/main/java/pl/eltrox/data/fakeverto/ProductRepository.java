@@ -1,9 +1,12 @@
-package pl.eltrox.data.memory;
+package pl.eltrox.data.fakeverto;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 import pl.eltrox.core.domain.entity.Product;
 import pl.eltrox.core.domain.repository.ProductRepositoryInterface;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -14,6 +17,22 @@ public class ProductRepository implements ProductRepositoryInterface {
     private Long maxId = 0L;
 
     public ProductRepository() {
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            Map<?, ?> articles = mapper.readValue(new FileInputStream("articles.json"), Map.class);
+            ArrayList<Map<?, ?>> articleDataList = (ArrayList<Map<?, ?>>) articles.get("articleDataList");
+
+            for (Map<?, ?> article : articleDataList) {
+                String name = (String) article.get("shortName");
+                Map<?, ?> articleId = (Map<?, ?>) article.get("articleId");
+                String sku = (String) articleId.get("index");
+                Long id = Long.valueOf((Integer) articleId.get("idArticle"));
+
+                save(new Product(name, sku, id));
+            }
+        } catch (IOException e) {
+
+        }
     }
 
     @Override

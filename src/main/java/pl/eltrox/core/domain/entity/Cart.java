@@ -1,13 +1,11 @@
 package pl.eltrox.core.domain.entity;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class Cart extends Entity {
 
     private final Customer customer;
-    private List<Product> products = new ArrayList<>();
+    private Collection<CartItem> items = new ArrayList<>();
 
     public Cart(Customer customer, Product product, Long id) {
         this(customer, product);
@@ -19,12 +17,55 @@ public class Cart extends Entity {
         this.addProduct(product);
     }
 
+    public Collection<CartItem> getItems() {
+        return items;
+    }
+
     public Cart(Customer customer) {
         this.customer = customer;
     }
 
+    public Customer getCustomer() {
+        return customer;
+    }
+
+    public void addProduct(Product product, int quantity) {
+        if (product == null) {
+            return;
+        }
+
+        for (CartItem item : items) {
+            if (item.getProduct().getId().equals(product.getId())) {
+                item.addQuantity(quantity);
+                return;
+            }
+        }
+
+        this.items.add(new CartItem(product, quantity));
+    }
+
+    public void addProduct(Product product) {
+        this.addProduct(product, 1);
+    }
+
     public boolean isProductInCart(Product product) {
-        return products.contains(product);
+        for (CartItem item : items) {
+            if (item.getProduct().getId().equals(product.getId())) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public int getProductQuantity(Product product) {
+        for (CartItem item : items) {
+            if (item.getProduct().getId().equals(product.getId())) {
+                return item.getQuantity();
+            }
+        }
+
+        return 0;
     }
 
     @Override
@@ -33,8 +74,8 @@ public class Cart extends Entity {
         Cart cart = new Cart(newCustomer);
         cart.setId(this.id);
 
-        for (Product product : products) {
-            cart.addProduct(product.clone());
+        for (CartItem item : items) {
+            cart.addProduct(item.getProduct().clone(), item.getQuantity());
         }
 
         return cart;
@@ -47,24 +88,12 @@ public class Cart extends Entity {
         Cart cart = (Cart) o;
 
         return Objects.equals(customer, cart.customer) &&
-                Objects.equals(products, cart.products) &&
+                Objects.equals(items, cart.items) &&
                 Objects.equals(id, cart.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(customer, products, id);
-    }
-
-    public Customer getCustomer() {
-        return customer;
-    }
-
-    public void addProduct(Product product) {
-        if (product == null) {
-            return;
-        }
-
-        this.products.add(product);
+        return Objects.hash(customer, items, id);
     }
 }

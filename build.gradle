@@ -1,5 +1,4 @@
 group 'JavaCart'
-version '1.0-SNAPSHOT'
 
 buildscript {
     repositories {
@@ -18,6 +17,12 @@ apply plugin: 'org.springframework.boot'
 jar {
     baseName = 'javacart'
     version =  '0.1.0'
+    manifest {
+        attributes "Main-Class": "pl.eltrox.apps.webapi.Application"
+    }
+    from {
+        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+    }
 }
 
 repositories {

@@ -1,4 +1,4 @@
-package repository
+package repository.memory
 
 import pl.eltrox.data.memory.CustomerRepository
 import pl.eltrox.core.domain.entity.Customer
@@ -125,5 +125,41 @@ class CustomerRepositorySpecs extends Specification {
         customer.getLastName() == addedCustomer.getLastName()
 
         beforeSaveCount == afterSaveCount - 1
+    }
+
+    def "CustomerRepository.find() should return Customer collection filtered by firstName"() {
+        setup:
+        def filter = [firstName: "John"]
+
+        when:
+        Collection<Customer> customers = customerRepository.find(filter)
+
+        then:
+        customers.size() != 0
+        customers.each { it.firstName.toLowerCase().contains("John".toLowerCase())}
+    }
+
+    def "CustomerRepository.find() should return Customer collection filtered by lastName"() {
+        setup:
+        def filter = [lastName: "Doe"]
+
+        when:
+        Collection<Customer> customers = customerRepository.find(filter)
+
+        then:
+        customers.size() != 0
+        customers.each { it.lastName.toLowerCase().contains("Doe".toLowerCase())}
+    }
+
+    def "CustomerRepository.find() should return Customer collection filtered by firstName and lastName"() {
+        setup:
+        def filter = [firstName: "john", lastName: "doe"]
+
+        when:
+        Collection<Customer> customers = customerRepository.find(filter)
+
+        then:
+        customers.size() != 0
+        customers.each { it.firstName.toLowerCase().contains("john") && it.lastName.toLowerCase().contains("Doe".toLowerCase())}
     }
 }

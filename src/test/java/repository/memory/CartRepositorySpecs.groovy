@@ -1,4 +1,4 @@
-package repository
+package repository.memory
 
 import pl.eltrox.data.memory.CartRepository
 import pl.eltrox.data.memory.CustomerRepository
